@@ -152,7 +152,7 @@ def current_task():
     return "Done"
 
 
-def savetimes(times, notes, tasks={}, title='', file_name="times.json"):
+def savetimes(times, notes, tasks, title='', file_name="times.json"):
     print("times:", times, "\nnotes:",notes,"\ntasks:", tasks,"\ntitle:", title)
     saved={}
     for i, (key, val) in enumerate(tasks.items()):
@@ -162,6 +162,7 @@ def savetimes(times, notes, tasks={}, title='', file_name="times.json"):
             if times[str(i)]==None or val == None or len(key) == 0:
                 continue
             saved.update({key:[val, notes[str(i)]]})
+            print({key:[val, notes[str(i)]]})
         except KeyError:
             continue
     print(saved)
@@ -211,10 +212,11 @@ def loadtimes(window, file_name="Saved.json"):
 
     values = {}
     try:
-        with open(file_name, 'r') as file:
+        with open("Saved.json", 'r') as file:
             values = json.load(file)
     except FileNotFoundError:
         values = {}
+    print(values, 'val')
 
     """
     task_name: [duration, note]
@@ -287,12 +289,15 @@ while True:
             tasks.update({vals[val]: times[val]})
         if str(val).isdigit() and f"notes {val}" in vals:
             note = vals[f'notes {val}']
-            if times[val] != None:
+            """
+            """
+            if times[val]!=None:
+
                 notes.update({val: note})
+            print({val:note}, 'NOTE')
 
     # for val in vals:
 
-    print(notes)
     remove = []
     for key, val in tasks.items():
         if key not in vals.values():
@@ -306,6 +311,7 @@ while True:
         savetitle(title)
     if evt == 'change_task':
         window['Task'].update(value=current_task())
+        savetimes(times, notes, tasks, title)
     if evt == 'Schedule':
         if len(sched) >= 1:
             window[sched[-1]].update(visible=False)
@@ -321,8 +327,8 @@ while True:
         window['home'].update(visible=False)
         window['main'].update(visible=True)
         loadtimes(window)
+        print("load")
         loadtitle(window)
-
 
     if 'open section' in evt[0]:
         opened1 = not opened1
@@ -336,7 +342,6 @@ while True:
 
         change_time(tasks, vals, times)
     if evt == 'Add':
-        window.metadata += 1
         times.update({str(window.metadata): 0})
         savetimes(times, notes, tasks, title)
         window.extend_layout(window['Col'], [generate_row(f'{window.metadata}')])
@@ -347,6 +352,9 @@ while True:
         tasks = combine(tasks, vals, times)
         title = vals['Title']
         savetimes(times, notes, tasks, title)
+        window.metadata += 1
+
+
 
     if evt[0] == 'Delete':
         window[('Row', evt[1])].update(visible=False)
@@ -366,3 +374,4 @@ while True:
 window.close()
 savetitle(title)
 savetimes(times, notes, tasks, title)
+# loadtimes(window)
