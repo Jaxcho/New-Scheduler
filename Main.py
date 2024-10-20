@@ -355,7 +355,6 @@ while True:
         window.metadata += 1
 
 
-
     if evt[0] == 'Delete':
         window[('Row', evt[1])].update(visible=False)
         times[evt[1]] = None
